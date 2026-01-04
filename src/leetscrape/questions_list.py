@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 
-from ._constants import CATEGORIES, TOPIC_TAGS
+from ._constants import CATEGORIES, HEADERS, TOPIC_TAGS
 
 
 class GetQuestionsList:
@@ -59,7 +59,20 @@ class GetQuestionsList:
             """,
             "variables": {},
         }
-        r = requests.post("https://leetcode.com/graphql", json=data).json()
+        response = requests.post("https://leetcode.com/graphql", json=data, headers=HEADERS)
+        if not response.ok:
+            raise ValueError(
+                f"LeetCode API returned error status {response.status_code}. "
+                f"Response: {response.text[:200]}"
+            )
+        try:
+            r = response.json()
+        except requests.exceptions.JSONDecodeError as e:
+            raise ValueError(
+                f"Failed to parse JSON response from LeetCode API. "
+                f"Status code: {response.status_code}. "
+                f"Response: {response.text[:200]}"
+            ) from e
         self.companies = pd.json_normalize(r["data"]["companyTags"])
         print("Done")
 
@@ -99,7 +112,20 @@ class GetQuestionsList:
             },
         }
 
-        r = requests.post("https://leetcode.com/graphql", json=data).json()
+        response = requests.post("https://leetcode.com/graphql", json=data, headers=HEADERS)
+        if not response.ok:
+            raise ValueError(
+                f"LeetCode API returned error status {response.status_code}. "
+                f"Response: {response.text[:200]}"
+            )
+        try:
+            r = response.json()
+        except requests.exceptions.JSONDecodeError as e:
+            raise ValueError(
+                f"Failed to parse JSON response from LeetCode API. "
+                f"Status code: {response.status_code}. "
+                f"Response: {response.text[:200]}"
+            ) from e
         self.questions = pd.json_normalize(
             r["data"]["problemsetQuestionList"]["questions"]
         )[
@@ -167,7 +193,20 @@ class GetQuestionsList:
                 },
             }
 
-            r = requests.post("https://leetcode.com/graphql", json=data).json()
+            response = requests.post("https://leetcode.com/graphql", json=data, headers=HEADERS)
+            if not response.ok:
+                raise ValueError(
+                    f"LeetCode API returned error status {response.status_code}. "
+                    f"Response: {response.text[:200]}"
+                )
+            try:
+                r = response.json()
+            except requests.exceptions.JSONDecodeError as e:
+                raise ValueError(
+                    f"Failed to parse JSON response from LeetCode API. "
+                    f"Status code: {response.status_code}. "
+                    f"Response: {response.text[:200]}"
+                ) from e
             categories = pd.json_normalize(
                 r["data"]["problemsetQuestionList"]["questions"]
             )
